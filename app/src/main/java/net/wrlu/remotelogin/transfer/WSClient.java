@@ -23,19 +23,15 @@ public class WSClient {
     private static final String SERVER_URL_CN = "wss://api.wrlus.com/ws/intent/";
     private static final String SERVER_URL_GLOBAL = "wss://api.wrlu.net/ws/intent/";
     private static String sServerUrl = SERVER_URL_CN;
-
     private static WSClient sInstance;
     private WebSocket mWebSocket;
     private IntentTransferListener mListener;
-
-
     private final String deviceId;
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
 
     public static class Api {
         public static final String INTENT_TRANSFER = "1";
         public static final String REGISTER_HOST = "2";
-        public static final String WEIXIN_LOGIN = "3";
     }
 
     private WSClient() {
@@ -80,6 +76,7 @@ public class WSClient {
             JSONObject json = new JSONObject();
             json.put("api", Api.REGISTER_HOST);
             json.put("type", type);
+            json.put("token", "");
             mWebSocket.send(json.toString());
         } catch (Exception e) {
             Log.e(TAG, "API registerHost failed", e);

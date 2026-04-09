@@ -4,6 +4,8 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.util.Log;
 
+import net.wrlu.remotelogin.transfer.Role;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
@@ -16,6 +18,7 @@ public class RemoteLoginServer extends AbsRemoteLogin {
     @Override
     public void init(ClassLoader classLoader) {
         super.init(classLoader);
+        mWSClient.registerHost(Role.SUPER_HOST);
         startWorkerThread();
     }
 

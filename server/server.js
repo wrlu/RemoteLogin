@@ -14,8 +14,7 @@ const roleToDevice = new Map();
 // 对齐客户端 WSClient.Api 内部类
 const Api = {
     INTENT_TRANSFER: "1",
-    REGISTER_HOST: "2",
-    WEIXIN_LOGIN: "3"
+    REGISTER_HOST: "2"
 };
 
 console.log(`Intent Forwarder started on port ${PORT}`);
@@ -81,7 +80,7 @@ function handleRegisterHost(deviceId, type) {
  * 对应客户端 sendIntent 逻辑与 parseAndDispatch 逻辑
  */
 function handleIntentTransfer(fromId, payload) {
-    let targetId = payload.toDeviceId; // 可能是物理 UUID，也可能是 "weixin_host" 等 Role
+    let targetId = payload.toDeviceId; // 可能是物理 UUID，也可能是 "super_host" 等 Role
 
     // 路由解析：Role -> 物理 DeviceID
     if (roleToDevice.has(targetId)) {
