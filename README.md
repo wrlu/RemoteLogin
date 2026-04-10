@@ -2,6 +2,14 @@
 
 RemoteLogin 是一个基于 LSPosed 框架的系统级工具，旨在通过 WebSocket 长连接，实现跨设备的 Android Intent 远程安全转发，完美解决“多设备间的授权拉起”等痛点场景。
 
+> **⚠️ 免责声明 (Disclaimer)**
+>
+> 本项目 (`Remote Intent Forwarder`) 及其包含的所有代码、架构设计仅供**个人学习、技术研究与学术交流**使用。
+>
+> 开发者不对任何因使用本项目造成的直接或间接损失负责。**严禁将本项目及其衍生技术用于任何非法用途、恶意劫持、灰黑产活动或绕过第三方应用的风控系统。** 使用本项目即代表您同意自行承担所有使用风险及由此产生的法律责任。
+>
+> **Disclaimer:** This project is strictly for educational, academic, and personal study purposes. The author assumes no responsibility for any consequences, damages, or legal issues arising from its use. Any illegal or malicious use—including but not limited to credential hijacking, unauthorized proxying, or bypassing third-party risk control systems—is strictly prohibited.
+
 ## 🏗 架构设计
 
 系统由 **Android LSPosed 模块** 和 **Node.js WebSocket 转发网关** 两部分组成。
