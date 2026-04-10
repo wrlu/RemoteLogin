@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
      * 统一的 UI 刷新方法
      */
     private void updateUI() {
-        String currentRole = Config.get(this, Config.Role.CONFIG_NAME);
-        boolean isLocked = Config.isLockedByProperty(Config.Role.CONFIG_NAME);
+        String currentRole = Config.get(this, Config.NAME_ROLE);
+        boolean isLocked = Config.isLockedByProperty(Config.NAME_ROLE);
 
         etCustomRole.setEnabled(!isLocked);
         switchSuperHost.setEnabled(!isLocked);
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            Config.setToPreference(MainActivity.this, Config.Role.CONFIG_NAME, customRole);
+            Config.setToPreference(MainActivity.this, Config.NAME_ROLE, customRole);
             Toast.makeText(MainActivity.this, "已写入: " + customRole, Toast.LENGTH_SHORT).show();
 
             updateUI();
@@ -82,10 +82,10 @@ public class MainActivity extends AppCompatActivity {
         switchSuperHost.setChecked(Config.Role.SUPER_HOST.equals(currentRole));
         switchSuperHost.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                Config.setToPreference(MainActivity.this, Config.Role.CONFIG_NAME,
+                Config.setToPreference(MainActivity.this, Config.NAME_ROLE,
                         Config.Role.SUPER_HOST);
             } else {
-                Config.setToPreference(MainActivity.this, Config.Role.CONFIG_NAME,
+                Config.setToPreference(MainActivity.this, Config.NAME_ROLE,
                         Config.Role.CLIENT);
             }
 

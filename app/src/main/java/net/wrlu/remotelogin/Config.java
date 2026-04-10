@@ -15,9 +15,9 @@ import java.util.Map;
 
 public class Config {
     private static final String TAG = "RemoteLoginConfig";
+    public static final String NAME_ROLE = "role";
+    public static final String NAME_TOKEN = "token";
     public static class Role {
-        public static final String CONFIG_NAME = "role";
-        public static final String WEIXIN_HOST = "weixin_host";
         public static final String SUPER_HOST = "super_host";
         public static final String CLIENT = "client";
     }

@@ -23,38 +23,46 @@ public class WSClient {
     private static final String SERVER_URL_CN = "wss://api.wrlus.com/ws/intent/";
     private static final String SERVER_URL_GLOBAL = "wss://api.wrlu.net/ws/intent/";
     private static String sServerUrl = SERVER_URL_CN;
-    private static WSClient sInstance;
-    private final OkHttpClient mOkHttpClient; // 提取为成员变量，复用连接池
+    private final OkHttpClient mOkHttpClient;
     private WebSocket mWebSocket;
     private IntentTransferListener mListener;
-    private final String deviceId;
+    private final String mDeviceId;
+    private final String mAuthToken;
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private volatile boolean mIsConnected = false;
     private volatile boolean mIsConnecting = false;
     private int mReconnectAttempts = 0;
-    private String mPendingHostType = null; // 记忆需要注册的 Host 身份
+    private String mPendingHostType = null;
 
     public static class Api {
         public static final String INTENT_TRANSFER = "1";
         public static final String REGISTER_HOST = "2";
     }
 
-    private WSClient() {
+    public WSClient(String token) {
         setServerUrlCN();
-        deviceId = UUID.randomUUID().toString();
-        mOkHttpClient = new OkHttpClient();
-    }
 
-    public static synchronized WSClient getInstance() {
-        if (sInstance == null) sInstance = new WSClient();
-        return sInstance;
+        mDeviceId = UUID.randomUUID().toString();
+        mAuthToken = token;
+        mOkHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(chain -> {
+                    Request originalRequest = chain.request();
+
+                    Request authRequest = originalRequest.newBuilder()
+                            .header("Authorization", "Bearer " + mAuthToken)
+                            .build();
+
+                    return chain.proceed(authRequest);
+                })
+                .pingInterval(30, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
     }
 
     public synchronized void connect() {
         if (mIsConnected || mIsConnecting) return;
         mIsConnecting = true;
 
-        Request request = new Request.Builder().url(sServerUrl + deviceId).build();
+        Request request = new Request.Builder().url(sServerUrl + mDeviceId).build();
 
         mWebSocket = mOkHttpClient.newWebSocket(request, new WebSocketListener() {
             @Override
@@ -147,7 +155,7 @@ public class WSClient {
                 switch (api) {
                     case Api.INTENT_TRANSFER: {
                         String toDeviceId = json.optString("toDeviceId");
-                        if (!this.deviceId.equals(toDeviceId)) {
+                        if (!this.mDeviceId.equals(toDeviceId)) {
                             Log.w(TAG, "INTENT_TRANSFER: target is not our device id.");
                             return;
                         }
@@ -175,5 +183,5 @@ public class WSClient {
 
     public void setServerUrlCN() { sServerUrl = SERVER_URL_CN; }
     public void setServerUrlGlobal() { sServerUrl = SERVER_URL_GLOBAL; }
-    public String getDeviceId() { return deviceId; }
+    public String getDeviceId() { return mDeviceId; }
 }

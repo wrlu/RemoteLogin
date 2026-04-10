@@ -1,17 +1,15 @@
 const WebSocket = require('ws');
 
 const PORT = 8888;
-const wss = new WebSocket.Server({ port: PORT });
+const wss = new WebSocket.Server({ host: '127.0.0.1', port: PORT });
 
 /**
- * 数据结构说明：
  * clients: Map<deviceId, WebSocket> -> 用于物理转发
  * roleToDevice: Map<type, deviceId> -> 用于角色路由解析
  */
 const clients = new Map();
 const roleToDevice = new Map();
 
-// 对齐客户端 WSClient.Api 内部类
 const Api = {
     INTENT_TRANSFER: "1",
     REGISTER_HOST: "2"
@@ -20,15 +18,28 @@ const Api = {
 console.log(`Intent Forwarder started on port ${PORT}`);
 
 wss.on('connection', (ws, req) => {
-    // 1. 获取 DeviceId: 对应 Request.Builder().url(sServerUrl + deviceId)
     const deviceId = req.url.split('/').pop();
     if (!deviceId) {
         console.error("[Conn] Rejected: No deviceId in URL");
-        return ws.close();
+        return ws.close(1008, "No deviceId");
+    }
+
+    if (clients.has(deviceId)) {
+        console.warn(`[Conflict] Device ${deviceId} is already connected. Kicking old connection.`);
+
+        const oldWs = clients.get(deviceId);
+
+        try {
+            oldWs.close(4001, "Kicked: Connected from another location");
+        } catch (e) {
+            console.error(`[Error] Failed to close old connection for ${deviceId}:`, e);
+        }
+
+        clients.delete(deviceId);
     }
 
     clients.set(deviceId, ws);
-    console.log(`[Connected] Device: ${deviceId}`);
+    console.log(`[New] Device: ${deviceId}`);
 
     ws.on('message', (message) => {
         try {
@@ -52,15 +63,14 @@ wss.on('connection', (ws, req) => {
         }
     });
 
-    ws.on('close', () => {
-        clients.delete(deviceId);
-        console.log(`[Disconnected] Device: ${deviceId}`);
+    ws.on('close', (code, reason) => {
+        if (clients.get(deviceId) === ws) {
+            clients.delete(deviceId);
+            console.log(`[Closed] Device: ${deviceId}, Code: ${code}`);
+        }
     });
 });
 
-/**
- * 对应客户端 registerHost 逻辑
- */
 function handleRegisterHost(deviceId, type) {
     if (!type) return;
 
@@ -74,9 +84,6 @@ function handleRegisterHost(deviceId, type) {
     roleToDevice.set(type, deviceId);
 }
 
-/**
- * 对应客户端 sendIntent 逻辑与 parseAndDispatch 逻辑
- */
 function handleIntentTransfer(fromId, payload) {
     let targetId = payload.toDeviceId; // 可能是物理 UUID，也可能是 "super_host" 等 Role
 
@@ -88,7 +95,6 @@ function handleIntentTransfer(fromId, payload) {
 
     const targetWs = clients.get(targetId);
     if (targetWs && targetWs.readyState === WebSocket.OPEN) {
-        // 构建发往目标端的 JSON，确保字段与客户端 parseAndDispatch 对齐
         const forwardData = {
             api: Api.INTENT_TRANSFER,
             from: fromId,          // 告知目标：谁发过来的

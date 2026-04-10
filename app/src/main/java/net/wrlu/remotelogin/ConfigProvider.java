@@ -23,7 +23,7 @@ public class ConfigProvider extends ContentProvider {
         String role = null;
         Context context = getContext();
         if (context != null) {
-            role = Config.get(context, Config.Role.CONFIG_NAME);
+            role = Config.get(context, Config.NAME_ROLE);
         }
         MatrixCursor cursor = new MatrixCursor(new String[]{ "value" });
         cursor.addRow(new Object[]{ role });

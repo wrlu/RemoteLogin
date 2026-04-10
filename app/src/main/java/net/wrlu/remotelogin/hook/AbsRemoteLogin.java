@@ -15,7 +15,7 @@ public abstract class AbsRemoteLogin implements ActivityStartInterceptor, Intent
     final HookActivityStarter mActivityStarterHooker;
 
     public AbsRemoteLogin() {
-        mWSClient = WSClient.getInstance();
+        mWSClient = new WSClient(getAuthToken());
         mWSClient.setIntentTransferListener(this);
 
         mActivityStarterHooker = new HookActivityStarter();
@@ -33,9 +33,16 @@ public abstract class AbsRemoteLogin implements ActivityStartInterceptor, Intent
 
     public static boolean isSuperRole() {
         String role = Config.get(ContextManager.getSystemContext(),
-                Config.Role.CONFIG_NAME);
+                Config.NAME_ROLE);
         XposedBridge.log("Current role config is: " + role);
         return Config.Role.SUPER_HOST.equals(role);
+    }
+
+    private static String getAuthToken() {
+        String token = Config.get(ContextManager.getSystemContext(),
+                Config.NAME_TOKEN);
+        XposedBridge.log("Auth token is: " + token);
+        return token;
     }
 
     @Override
