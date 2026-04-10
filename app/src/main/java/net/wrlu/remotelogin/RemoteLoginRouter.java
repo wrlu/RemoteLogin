@@ -28,10 +28,6 @@ public class RemoteLoginRouter implements IXposedHookLoadPackage, IXposedHookZyg
 
     static {
         packageHookers.add(HookFinishBooting.class);
-
-        // Deprecated old WX remote login implementation.
-        packageHookers.add(WXRemoteLoginClient.class);
-        packageHookers.add(WXRemoteLoginServer.class);
     }
 
     @Override

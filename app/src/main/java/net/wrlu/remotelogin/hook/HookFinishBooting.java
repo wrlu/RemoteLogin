@@ -10,7 +10,6 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class HookFinishBooting implements HookInterface {
-    private static final String TAG = "HookFinishBooting";
     private static boolean isInitialized = false;
 
     @Override

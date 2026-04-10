@@ -24,8 +24,8 @@
             </intent-filter>
         </activity>
         <provider
-            android:name=".SettingsProvider"
-            android:authorities="net.wrlu.remotelogin.settings"
+            android:name=".ConfigProvider"
+            android:authorities="net.wrlu.remotelogin.config"
             android:enabled="true"
             android:exported="true"
             android:directBootAware="true"

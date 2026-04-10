@@ -2,6 +2,5 @@
 <resources>
     <string-array name="xposed_scope">
         <item>android</item>
-        <item>com.tencent.mm</item>
     </string-array>
 </resources>

@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import net.wrlu.remotelogin.transfer.Role;
+import net.wrlu.remotelogin.Config;
 import net.wrlu.remotelogin.utils.ContextManager;
 import net.wrlu.remotelogin.utils.PackageNames;
 import net.wrlu.remotelogin.callback.IntentTransferListener;
@@ -29,8 +29,8 @@ public class WXRemoteLoginClient implements HookInterface, IntentTransferListene
 
     @Override
     public boolean isTarget(XC_LoadPackage.LoadPackageParam loadPackageParam) {
-        return loadPackageParam.processName.equals(loadPackageParam.packageName) &&
-                PackageNames.WEIXIN_PACKAGE.equals(loadPackageParam.packageName);
+        return PackageNames.WEIXIN_PACKAGE.equals(loadPackageParam.packageName) &&
+                loadPackageParam.processName.equals(loadPackageParam.packageName);
     }
 
     private void initWebSocket() {
@@ -71,7 +71,7 @@ public class WXRemoteLoginClient implements HookInterface, IntentTransferListene
 
     private void sendIntentToRemote(Activity activity, Intent intent) {
         WSClient client = WSClient.getInstance();
-        client.sendIntent(Role.WEIXIN_HOST, intent);
+        client.sendIntent(Config.Role.WEIXIN_HOST, intent);
 
         Toast.makeText(activity, "已转发拉起微信Request，请查看远端设备。", Toast.LENGTH_LONG).show();
     }

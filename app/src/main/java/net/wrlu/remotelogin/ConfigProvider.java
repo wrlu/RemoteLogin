@@ -9,11 +9,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import net.wrlu.remotelogin.transfer.Role;
-
-public class SettingsProvider extends ContentProvider {
-    public static final String AUTHORITY = "net.wrlu.remotelogin.settings";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/role");
+public class ConfigProvider extends ContentProvider {
+    public static final String AUTHORITY = "net.wrlu.remotelogin.config";
 
     @Override
     public boolean onCreate() {
@@ -26,7 +23,7 @@ public class SettingsProvider extends ContentProvider {
         String role = null;
         Context context = getContext();
         if (context != null) {
-            role = Role.getRoleLocal(context);
+            role = Config.get(context, Config.Role.CONFIG_NAME);
         }
         MatrixCursor cursor = new MatrixCursor(new String[]{ "value" });
         cursor.addRow(new Object[]{ role });

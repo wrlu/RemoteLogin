@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
+import de.robv.android.xposed.XposedBridge;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
@@ -79,7 +80,7 @@ public class WSClient {
             json.put("token", "");
             mWebSocket.send(json.toString());
         } catch (Exception e) {
-            Log.e(TAG, "API registerHost failed", e);
+            XposedBridge.log(e);
         }
     }
 
@@ -93,7 +94,7 @@ public class WSClient {
             json.put("data", base64);
             mWebSocket.send(json.toString());
         } catch (Exception e) {
-            Log.e(TAG, "API sendIntent failed", e);
+            XposedBridge.log(e);
         }
     }
 
@@ -124,7 +125,7 @@ public class WSClient {
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, "Dispatch failed", e);
+            XposedBridge.log(e);
         }
     }
 

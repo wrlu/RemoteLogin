@@ -4,13 +4,11 @@ import android.content.Intent;
 
 import net.wrlu.remotelogin.callback.ActivityStartInterceptor;
 import net.wrlu.remotelogin.callback.IntentTransferListener;
-import net.wrlu.remotelogin.transfer.Role;
+import net.wrlu.remotelogin.Config;
 import net.wrlu.remotelogin.transfer.WSClient;
 import net.wrlu.remotelogin.utils.ContextManager;
 
 public abstract class AbsRemoteLogin implements ActivityStartInterceptor, IntentTransferListener {
-    private static final String TAG = "AbsRemoteLogin";
-
     final WSClient mWSClient;
     final HookActivityStarter mActivityStarterHooker;
 
@@ -32,7 +30,8 @@ public abstract class AbsRemoteLogin implements ActivityStartInterceptor, Intent
     }
 
     public static boolean isSuperRole() {
-        return Role.SUPER_HOST.equals(Role.getRole(ContextManager.getSystemContext()));
+        return Config.Role.SUPER_HOST.equals(Config.get(ContextManager.getSystemContext(),
+                Config.Role.CONFIG_NAME));
     }
 
     @Override

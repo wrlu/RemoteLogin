@@ -3,7 +3,7 @@ package net.wrlu.remotelogin.hook;
 import android.content.ComponentName;
 import android.content.Intent;
 
-import net.wrlu.remotelogin.transfer.Role;
+import net.wrlu.remotelogin.Config;
 
 public class RemoteLoginClient extends AbsRemoteLogin {
     private static final String TAG = "RemoteLoginClient";
@@ -25,6 +25,6 @@ public class RemoteLoginClient extends AbsRemoteLogin {
 
     @Override
     public String getReceiverDeviceId() {
-        return Role.SUPER_HOST;
+        return Config.Role.SUPER_HOST;
     }
 }

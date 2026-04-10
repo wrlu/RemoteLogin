@@ -6,18 +6,17 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import net.wrlu.remotelogin.callback.ActivityStartInterceptor;
 import net.wrlu.remotelogin.utils.ContextManager;
 import net.wrlu.xposed.framework.HookInterface;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class HookActivityStarter implements HookInterface {
-    private static final String TAG = "HookActivityStarter";
 
     public static final int START_SUCCESS = 0;
     private ActivityStartInterceptor mInterceptor = null;
@@ -113,7 +112,7 @@ public class HookActivityStarter implements HookInterface {
         try {
             intentSender.sendIntent(systemContext, 0, null, null, null);
         } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Send Intent failed.", e);
+            XposedBridge.log(e);
         }
     }
 }

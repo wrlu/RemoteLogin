@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import net.wrlu.remotelogin.callback.IntentTransferListener;
-import net.wrlu.remotelogin.transfer.Role;
+import net.wrlu.remotelogin.Config;
 import net.wrlu.remotelogin.transfer.WSClient;
 import net.wrlu.remotelogin.utils.ContextManager;
 import net.wrlu.remotelogin.utils.PackageNames;
@@ -31,17 +31,17 @@ public class WXRemoteLoginServer implements HookInterface, IntentTransferListene
 
     @Override
     public boolean isTarget(XC_LoadPackage.LoadPackageParam loadPackageParam) {
-        return loadPackageParam.processName.equals(loadPackageParam.packageName) &&
-                !PackageNames.WEIXIN_PACKAGE.equals(loadPackageParam.packageName) &&
+        return !PackageNames.WEIXIN_PACKAGE.equals(loadPackageParam.packageName) &&
                 !"android".equals(loadPackageParam.packageName) &&
-                !"system".equals(loadPackageParam.packageName);
+                !"system".equals(loadPackageParam.packageName) &&
+                loadPackageParam.processName.equals(loadPackageParam.packageName);
     }
 
     private void initWebSocket() {
         WSClient client = WSClient.getInstance();
         client.setIntentTransferListener(this);
         client.connect();
-        client.registerHost(Role.WEIXIN_HOST);
+        client.registerHost(Config.Role.WEIXIN_HOST);
     }
 
     @Override
@@ -110,13 +110,4 @@ public class WXRemoteLoginServer implements HookInterface, IntentTransferListene
         client.sendIntent(fromDeviceId, intent);
         fromDeviceId = null;
     }
-
-    private boolean isWxApi(Intent intent) {
-        ComponentName componentName = intent.getComponent();
-        if (componentName != null) {
-            return componentName.getClassName().endsWith(".wxapi.WXEntryActivity");
-        }
-        return false;
-    }
-
 }

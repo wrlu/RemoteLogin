@@ -2,12 +2,13 @@ package net.wrlu.remotelogin.hook;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.util.Log;
 
-import net.wrlu.remotelogin.transfer.Role;
+import net.wrlu.remotelogin.Config;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+
+import de.robv.android.xposed.XposedBridge;
 
 public class RemoteLoginServer extends AbsRemoteLogin {
     private static final String TAG = "RemoteLoginServer";
@@ -18,7 +19,7 @@ public class RemoteLoginServer extends AbsRemoteLogin {
     @Override
     public void init(ClassLoader classLoader) {
         super.init(classLoader);
-        mWSClient.registerHost(Role.SUPER_HOST);
+        mWSClient.registerHost(Config.Role.SUPER_HOST);
         startWorkerThread();
     }
 
@@ -74,7 +75,7 @@ public class RemoteLoginServer extends AbsRemoteLogin {
                     // 死等回调
                     mFlowLock.acquire();
                 } catch (InterruptedException e) {
-                    Log.e(TAG, "WorkerThread interrupted!", e);
+                    XposedBridge.log(e);
                     break;
                 }
             }
