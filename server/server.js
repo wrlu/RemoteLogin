@@ -37,12 +37,10 @@ wss.on('connection', (ws, req) => {
 
             switch (api) {
                 case Api.REGISTER_HOST:
-                    // 对应 registerHost(String type)
                     handleRegisterHost(deviceId, payload.type);
                     break;
 
                 case Api.INTENT_TRANSFER:
-                    // 对应 sendIntent(String deviceId, String targetPackage, Intent intent, String sourcePackage)
                     handleIntentTransfer(deviceId, payload);
                     break;
 

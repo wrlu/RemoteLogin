@@ -8,6 +8,8 @@ import net.wrlu.remotelogin.Config;
 import net.wrlu.remotelogin.transfer.WSClient;
 import net.wrlu.remotelogin.utils.ContextManager;
 
+import de.robv.android.xposed.XposedBridge;
+
 public abstract class AbsRemoteLogin implements ActivityStartInterceptor, IntentTransferListener {
     final WSClient mWSClient;
     final HookActivityStarter mActivityStarterHooker;
@@ -30,8 +32,10 @@ public abstract class AbsRemoteLogin implements ActivityStartInterceptor, Intent
     }
 
     public static boolean isSuperRole() {
-        return Config.Role.SUPER_HOST.equals(Config.get(ContextManager.getSystemContext(),
-                Config.Role.CONFIG_NAME));
+        String role = Config.get(ContextManager.getSystemContext(),
+                Config.Role.CONFIG_NAME);
+        XposedBridge.log("Current role config is: " + role);
+        return Config.Role.SUPER_HOST.equals(role);
     }
 
     @Override
