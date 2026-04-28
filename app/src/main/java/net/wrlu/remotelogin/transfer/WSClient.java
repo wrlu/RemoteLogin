@@ -11,7 +11,9 @@ import net.wrlu.remotelogin.callback.IntentTransferListener;
 
 import org.json.JSONObject;
 
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,7 +34,8 @@ public class WSClient {
     private volatile boolean mIsConnected = false;
     private volatile boolean mIsConnecting = false;
     private int mReconnectAttempts = 0;
-    private String mPendingHostType = null;
+    private String mHostType = null;
+    private final Queue<String> mPendingMessages = new ConcurrentLinkedQueue<>();
 
     public static class Api {
         public static final String INTENT_TRANSFER = "1";
@@ -71,8 +74,15 @@ public class WSClient {
                 mIsConnecting = false;
                 mReconnectAttempts = 0;
 
-                if (mPendingHostType != null) {
-                    registerHost(mPendingHostType);
+                // 连接成功后，如果有预设身份，先执行注册
+                if (mHostType != null) {
+                    registerHost(mHostType);
+                }
+
+                // 然后发送所有排队中的消息
+                String msg;
+                while ((msg = mPendingMessages.poll()) != null) {
+                    webSocket.send(msg);
                 }
             }
 
@@ -110,38 +120,38 @@ public class WSClient {
     }
 
     public void registerHost(String type) {
-        // 记忆当前设备的身份，方便断线重连时自动恢复
-        mPendingHostType = type;
-
-        // 如果还没连上，什么都不用做，直接 return。
-        // 因为等到 connect() -> onOpen() 被系统底层触发时，会自动读取 mPendingHostType 并执行发送。
-        if (!mIsConnected || mWebSocket == null) {
-            Log.w(TAG, "WebSocket disconnected. Pending registration for role [" + type + "].");
-            return;
-        }
-
+        mHostType = type;
         try {
             JSONObject json = new JSONObject();
             json.put("api", Api.REGISTER_HOST);
             json.put("type", type);
-            mWebSocket.send(json.toString());
+            sendRequest(json);
         } catch (Exception e) {
             Log.e(TAG, "registerHost", e);
         }
     }
 
     public void sendIntent(String deviceId, Intent intent) {
-        if (!mIsConnected || mWebSocket == null) return;
-
         try {
             String base64 = RemoteIntent.serialize(intent);
             JSONObject json = new JSONObject();
             json.put("api", Api.INTENT_TRANSFER);
             json.put("toDeviceId", deviceId);
             json.put("data", base64);
-            mWebSocket.send(json.toString());
+            sendRequest(json);
         } catch (Exception e) {
             Log.e(TAG, "sendIntent", e);
+        }
+    }
+
+    private void sendRequest(JSONObject json) {
+        String text = json.toString();
+        if (mIsConnected && mWebSocket != null) {
+            mWebSocket.send(text);
+        } else {
+            // 如果未连接，进入队列并尝试连接
+            mPendingMessages.offer(text);
+            connect();
         }
     }
 

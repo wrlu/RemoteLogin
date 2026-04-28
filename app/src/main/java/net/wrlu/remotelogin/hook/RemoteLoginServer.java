@@ -8,8 +8,6 @@ import net.wrlu.remotelogin.Config;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
-import de.robv.android.xposed.XposedBridge;
-
 public class RemoteLoginServer extends AbsRemoteLogin {
     private static final String TAG = "RemoteLoginServer";
     private transient String mLastFromDeviceId;
@@ -75,7 +73,6 @@ public class RemoteLoginServer extends AbsRemoteLogin {
                     // 死等回调
                     mFlowLock.acquire();
                 } catch (InterruptedException e) {
-                    XposedBridge.log(e);
                     break;
                 }
             }
